@@ -1,1 +1,4 @@
 TODO(Checkpoint Requirement 1 of 3): Add team member names and emails.
+
+Donald Echefu <donaldechefu@techexchange.in>
+Jabez Agyemang Prempeh <	jabez.agyemang-prem@techexchange.in>
