@@ -11,6 +11,11 @@
     <p>The game was a commercial and critical success, selling over three million copies worldwide and earning praise for its gameplay, graphics, and soundtrack. It is considered one of the best fighting games of all time and a classic of the genre, and its legacy can be seen in the continued popularity of the Tekken series to this day.</p>
     
     <!-- Load image from GCS bucket -->
-    <img src="https://storage.googleapis.com/dijproject_wiki_content/Tekken2Box.jpg" alt="Tekken 2 Game Cover">
+    <img src="{{ url_for('static', filename='Tekken2Box.jpg') }}" alt="Tekken 2 Game Cover">
+    {% set image_bytes = backend.get_image('Tekken2Box.jpg') %}
+    {% if image_bytes %}
+        {% set image_b64 = b64encode(image_bytes).decode('utf-8') %}
+        <img src="data:image/jpeg;base64,{{ image_b64 }}">
+    {% endif %}
   </body>
 </html>

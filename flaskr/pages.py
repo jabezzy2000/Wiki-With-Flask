@@ -1,7 +1,9 @@
 from flask import render_template
+from flaskr.backend import Backend
 
 
 def make_endpoints(app):
+    backend = Backend("dijproject_wiki_content")
 
     # Flask uses the "app.route" decorator to call methods when users
     # go to a specific route on the project's website.
@@ -18,3 +20,28 @@ def make_endpoints(app):
     def index():
         pages = ['dbz', 'tekken']
         return render_template('index.html', pages = pages)
+
+    @app.route('/tekken')
+    def tekken():
+        image_data = backend.get_image("Tekken2Box.jpg")
+        return render_template('tekken.html', image_data=image_data, backend= backend)
+
+    @app.route('/dbz')
+    def dbz():
+        return render_template('dbz.html')
+
+    @app.route('/login')
+    def login():
+        return render_template("login.html")
+
+    @app.route('/signup')
+    def signup():
+        return render_template("signup.html")
+
+    @app.route('/about')
+    def about():
+        jabez = "jabez.HEIC"
+        jabez_link = backend.get_image(jabez)
+        #add donald and ivan link when i get their pictures
+        print(jabez_link)        
+        return render_template("about.html",image1_link = jabez_link)

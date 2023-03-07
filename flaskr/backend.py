@@ -1,10 +1,11 @@
 # TODO(Project 1): Implement Backend according to the requirements.
-import google.cloud
+from google.cloud import storage
+from base64 import b64encode
 import hashlib
 class Backend:
 
     def __init__(self,bucket_name):
-        self.client = google.cloud.storage.Client()
+        self.client = storage.Client()
         self.bucket = self.client.bucket(bucket_name)
 
     def get_wiki_page(self, name):
@@ -44,11 +45,11 @@ class Backend:
         pass
 
     def get_image(self,name_of_image):
-        blob = self.bucket.get_blob(f"images/{name_of_image}")
+        blob = self.bucket.get_blob(f"/{name_of_image}")
         if blob is None:
             return None
         else:
-            return blob.download_as_bytes()
+            return blob.public_url
         pass
 
     def _hash_password(self,password):

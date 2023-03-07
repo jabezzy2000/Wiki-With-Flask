@@ -1,17 +1,32 @@
-{% extends "main.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>About This Wiki</title>
+</head>
+<body>
+  <h3>About this Wiki</h3>
 
-{% block page_name %}
-About This Wiki
-{% endblock %}
+  <p>Welcome to our wiki! Here you can find information about various topics related to computer science and technology.</p>
 
-{% block content %}
-<h3>About this Wiki</h3>
+  <h3>Your Authors</h3>
 
-<!-- TODO(Project 1): Add info about the wiki. -->
+  <div class="author">
+    <h4>Jabez Agyemang</h4>
+    <img src="{}" alt="Image Description".format(image1_link)>
 
-<h3>Your Authors</h3>
+    <p>Jabez is a computer science student at Howard University who loves watching anime during his free time.</p>
+  </div>
 
-<!-- TODO(Project 1): Add team members and pictures to about page. -->
+  <div class="author">
+    <h4>Donald Echefu</h4>
+    <img src="https://via.placeholder.com/150" alt="Donald Echefu">
+    <p>Donald is a computer science student from Nigeria at Howard University. He loves to play FIFA and watch anime.</p>
+  </div>
 
-{% endblock %}
-
+  <div class="author">
+    <h4>Ivan Ibhawoh</h4>
+    <img src="https://via.placeholder.com/150" alt="Ivan Ibhawoh">
+    <p>Ivan is also a Nigerian studying computer science at Howard University.</p>
+  </div>
+</body>
+</html>
