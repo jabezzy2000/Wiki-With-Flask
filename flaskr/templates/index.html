@@ -7,7 +7,7 @@
   <h1>Welcome to My Wiki!</h1>
   <ul>
     {% for page in pages %}
-    <li><a href="{{ url_for('page', name=page) }}">{{ page }}</a></li>
+    <li><a href="{{ url_for('index') }}">{{ page }}</a></li>
     {% endfor %}
   </ul>
 </body>
