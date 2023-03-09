@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from flask import Flask, url_for
 from flaskr.backend import Backend
+from io import BytesIO
 import pytest
 
 # See https://flask.palletsprojects.com/en/2.2.x/testing/ 
@@ -57,14 +58,59 @@ class FlaskTestCase(unittest.TestCase):
             self.assertIn(b'page1', response.data)
             self.assertIn(b'page2', response.data)
 
+    def test_about_page(self):
+        with patch('flaskr.backend.Backend.get_image') as mock_backend:
+            mock_backend.return_value = b'fake image data'
+            resp = self.client.get("/about")
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(b'fake image data', resp.data)
 
-# @patch.object(Backend, 'sign_up')
-# def test_signup_success(mock_sign_up):
-#     mock_sign_up.return_value = True
-#     response = client.post('/signup', data=dict(
-#         username='test_user',
-#         password='test_password'
-#     ), follow_redirects=True)
-#     assert(response)
-#     assertIn(b'Successfully signed up!', response.data)
+    def test_page_details(self):
+        with patch('flaskr.backend.Backend.get_wiki_page') as mock_content:
+            mock_content.return_value = "This is the content of the page"
+            response = self.client.get('/pages/test_page')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Test Page', response.data)
+            self.assertIn(b'This is the content of the page', response.data)
+
+
+    def test_upload_file(self):
+        with patch('flaskr.backend.Backend.upload') as mock_upload:
+            mock_upload.return_value = True
+            response = self.client.post('/upload', data=dict(
+                file=(BytesIO(b'my file contents'), 'test_file.txt')
+            ))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'File uploaded successfully!', response.data)
+
+    def test_login(self):
+        with patch('flaskr.backend.Backend.sign_in') as mock_verify:
+            mock_verify.return_value = True
+            response = self.client.post('/login', data=dict(
+                username='test_user',
+                password='test_password'
+            ))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Location'], 'http://localhost/')
+
+    def test_signup(self):
+        with patch('flaskr.backend.Backend.sign_up') as mock_create:
+            mock_create.return_value = True
+            response = self.client.post('/signup', data=dict(
+                username='test_user',
+                password='test_password'
+            ))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.headers['Location'], 'http://localhost/login')
+
+    def test_logout(self):
+        with patch('flaskr.backend.Backend.sign_in') as mock_verify:
+            mock_verify.return_value = True
+            with patch('flaskr.backend.Backend.logout_user') as mock_logout:
+                mock_logout.return_value = True
+                response = self.client.get('/logout')
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.headers['Location'], 'http://localhost/')
+
+
 # TODO(Project 1): Write tests for other routes.
