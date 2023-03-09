@@ -90,7 +90,7 @@ class FlaskTestCase(unittest.TestCase):
                 username='test_user',
                 password='test_password'
             ))
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertEqual(response.headers['Location'], 'http://localhost/')
 
     def test_signup(self):
@@ -100,7 +100,7 @@ class FlaskTestCase(unittest.TestCase):
                 username='test_user',
                 password='test_password'
             ))
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertEqual(response.headers['Location'], 'http://localhost/login')
 
     def test_logout(self):
