@@ -9,20 +9,22 @@ class Backend:
         self.bucket = self.client.bucket(bucket_name)
 
     def get_wiki_page(self, name):
-        blob = self.bucket.get_blob(f"pages/{name}")
+        blob = self.bucket.get_blob(f"uploads/{name}")
         if blob is None:
             return None
-        return blob.download_as_text()
+        local_file_path = "/home/jabez_agyemang_prem/project/flaskr/templates/" + name
+        blob.download_to_filename(local_file_path)
+        return name
 
     def get_all_page_names(self):
-        pages = self.bucket.list_blobs(prefix="pages/")
-        length = len("pages/")
+        pages = self.bucket.list_blobs(prefix="uploads/")
+        length = len("uploads/")
         return [page.name[length:] for page in pages]
 
 
-    def upload(self,data,filename):
+    def upload(self,filepath,filename):
         blob = self.bucket.blob(f"uploads/{filename}")
-        blob.upload_from_string(data)
+        blob.upload_from_filename(filepath, content_type='text/html')
         pass
 
     def sign_up(self,username,password):

@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request
 from flaskr.backend import Backend
 
 
@@ -11,24 +11,26 @@ def make_endpoints(app):
     def home():
         # TODO(Checkpoint Requirement 2 of 3): Change this to use render_template
         # to render main.html on the home page.
-        page_links = [    {"name": "Home", "url": "/"},    {"name": "Pages", "url": "/index"},    {"name": "About", "url": "/about"},    {"name": "Login", "url": "/login"},    {"name": "Sign up", "url": "/signup"}]
-        greeting = "Welcome to our Wiki page! We hope you love it here."        
+        page_links = [    {"name": "Home", "url": "/"},    {"name": "Pages", "url": "/pages"},    {"name": "About", "url": "/about"}, {"name": "Upload", "url": "/upload"},    {"name": "Login", "url": "/login"},    {"name": "Sign up", "url": "/signup"}]
+        greeting = "Welcome to our Wiki page! We hope you love it here."    
+        # backend.upload("hi dbz","dbz.html")   
+        # backend.upload("hi tekken","tekken.html")  
+        # backend.upload("hi mario","mario.html") 
         return render_template("main.html", greeting= greeting, page_links = page_links)
 
     # TODO(Project 1): Implement additional routes according to the project requirements.
-    @app.route('/index')
+    @app.route('/pages')
     def index():
-        pages = ['dbz', 'tekken']
-        return render_template('index.html', pages = pages)
+        pages = backend.get_all_page_names()
+        print(pages)
+        return render_template('pages.html', pages = pages)
 
-    @app.route('/tekken')
-    def tekken():
-        image_data = backend.get_image("Tekken2Box.jpg")
-        return render_template('tekken.html', image_data=image_data, backend= backend)
-
-    @app.route('/dbz')
-    def dbz():
-        return render_template('dbz.html')
+    @app.route('/pages/<pagename>')
+    def pages(pagename):
+        #use method 
+        file_name = backend.get_wiki_page(pagename)
+        return render_template(file_name)
+        # return render_template(file_name)
 
     @app.route('/login')
     def login():
@@ -38,10 +40,31 @@ def make_endpoints(app):
     def signup():
         return render_template("signup.html")
 
+
+    @app.route('/upload',methods =['GET','POST'])
+    def upload():
+        if request.method == 'POST':
+        # Get the uploaded file from the HTML form
+            uploaded_file = request.files['html_file']
+
+            # Save the uploaded file to a temporary location
+            filepath = '/tmp/' + uploaded_file.filename
+            uploaded_file.save(filepath)
+
+            # Call the "upload()" method to save the file to Google Cloud Storage
+            backend.upload(filepath, uploaded_file.filename)
+
+            # Render a success message
+            message = f'{uploaded_file.filename} has been uploaded successfully!'
+            return render_template('upload.html', message=message)
+        else:
+            # Render the upload form
+            return render_template('upload.html')
+
     @app.route('/about')
     def about():
-        jabez = "jabez.HEIC"
-        jabez_link = backend.get_image(jabez)
+        # jabez = "jabez.HEIC"
+        jabez_link = backend.get_image('jabez.HEIC')
         #add donald and ivan link when i get their pictures
         print(jabez_link)        
-        return render_template("about.html",image1_link = jabez_link)
+        return render_template("about.html",image1_link = 'https://storage.googleapis.com/dijproject_wiki_content/jabez.HEIC')

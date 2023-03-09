@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Upload HTML File</title>
+    </head>
+    <body>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" name="html_file" accept=".html">
+            <br><br>
+            <input type="submit" value="Upload">
+        </form>
+    </body>
+</html>
