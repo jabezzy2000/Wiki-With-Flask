@@ -78,10 +78,10 @@ class FlaskTestCase(unittest.TestCase):
         with patch('flaskr.backend.Backend.upload') as mock_upload:
             mock_upload.return_value = True
             response = self.client.post('/upload', data=dict(
-                file=(BytesIO(b'my file contents'), 'test_file.txt')
+                html_file=(BytesIO(b'my file contents'), 'test_file.txt')
             ))
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'File uploaded successfully!', response.data)
+            self.assertIn(b'test_file.txt has been uploaded successfully!', response.data)
 
     def test_login(self):
         with patch('flaskr.backend.Backend.sign_in') as mock_verify:
