@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, abort
 from flaskr.backend import Backend
 
 
@@ -27,18 +27,21 @@ def make_endpoints(app):
 
     @app.route('/pages/<pagename>')
     def pages(pagename):
-        #use method 
-        file_name = backend.get_wiki_page(pagename)
-        return render_template(file_name)
-        # return render_template(file_name)
+        file_name = f"uploads/{pagename}"
+        contents = backend.get_wiki_page(file_name)
+        if contents is None:
+            abort(404)
+        return render_template(pagename+".html", contents=contents)
 
-    @app.route('/login')
-    def login():
-        return render_template("login.html")
-
-    @app.route('/signup')
+    @app.route("/signup", methods=["GET", "POST"])
     def signup():
-        return render_template("signup.html")
+            return render_template("signup.html")
+
+
+    @app.route("/login", methods=["GET", "POST"])
+    def login():
+            return render_template("login.html")
+
 
 
     @app.route('/upload',methods =['GET','POST'])
@@ -46,7 +49,7 @@ def make_endpoints(app):
         if request.method == 'POST':
         # Get the uploaded file from the HTML form
             uploaded_file = request.files['html_file']
-
+            print(request.files.keys())
             # Save the uploaded file to a temporary location
             filepath = '/tmp/' + uploaded_file.filename
             uploaded_file.save(filepath)
@@ -67,4 +70,4 @@ def make_endpoints(app):
         jabez_link = backend.get_image('jabez.HEIC')
         #add donald and ivan link when i get their pictures
         print(jabez_link)        
-        return render_template("about.html",image1_link = 'https://storage.googleapis.com/dijproject_wiki_content/jabez.HEIC')
+        return render_template("about.html",image1_link = jabez_link)
