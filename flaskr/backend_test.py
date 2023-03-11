@@ -10,7 +10,7 @@ class TestBackend(unittest.TestCase):
     
     @classmethod
     def setUpClass(cls):
-        cls.backend = Backend(bucket_name="test-bucket")
+        cls.backend = Backend(bucket_name="dij-test-bucket")
 
     def test_upload_and_get_wiki_page(self):
         # Test uploading a file and retrieving it
