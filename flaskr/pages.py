@@ -1,4 +1,4 @@
-from flask import render_template, request, abort
+from flask import Flask, render_template, request, abort, redirect, url_for, session, flash
 from flaskr.backend import Backend
 
 
@@ -35,35 +35,60 @@ def make_endpoints(app):
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
-            return render_template("signup.html")
+        if request.method == 'POST':
+            username = request.form['username']
+            password = request.form['password']
+            if backend.sign_up(username, password):
+                return 'Sign up successful!'
+            else:
+                return 'Username already taken!'
+        else:
+            return render_template('signup.html')
+            
 
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
-            return render_template("login.html")
+        if request.method == 'POST':
+            # Get username and password from form data
+            username = request.form['username']
+            password = request.form['password']
 
+            # Check if user exists and if password matches
+            if backend.sign_in(username, password):
+                # Set session variable to store username
+                session['username'] = username
+
+                # Redirect to upload page
+                return redirect(url_for('upload'))
+            else:
+                # Show error message on login page
+                return render_template('login.html', error='Invalid username or password')
+
+        # If GET request, render login page
+        return render_template('login.html')
+
+    @app.route("/logout", methods=['POST'])
+    def logout():
+        session.pop('username', None)
+        return redirect('/login')
 
 
     @app.route('/upload',methods =['GET','POST'])
-    def upload():
+    def upload_file():
         if request.method == 'POST':
-        # Get the uploaded file from the HTML form
-            uploaded_file = request.files['html_file']
-            print(request.files.keys())
-            # Save the uploaded file to a temporary location
-            filepath = '/tmp/' + uploaded_file.filename
-            uploaded_file.save(filepath)
-
-            # Call the "upload()" method to save the file to Google Cloud Storage
-            backend.upload(filepath, uploaded_file.filename)
-
-            # Render a success message
-            message = f'{uploaded_file.filename} has been uploaded successfully!'
-            return render_template('upload.html', message=message)
-        else:
-            # Render the upload form
-            return render_template('upload.html')
-
+        # Check if a file was uploaded
+            if 'file' not in request.files:
+                return redirect(request.url)
+            file = request.files['file']
+            # Check if the file is empty
+            if file.filename == '':
+                return redirect(request.url)
+            # Upload the file to GCS
+            backend.upload(filepath=file, filename=file.filename)
+            return redirect('/')
+    return render_template('upload.html')
+        
     @app.route('/about')
     def about():
         # jabez = "jabez.HEIC"
