@@ -68,3 +68,5 @@ class TestBackend(unittest.TestCase):
             mock_get_blob.return_value.public_url = expected_url
             url = self.backend.get_image(name_of_image=image_name)
         self.assertEqual(url, expected_url)
+
+#random comment
