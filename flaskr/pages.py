@@ -11,19 +11,39 @@ def make_endpoints(app):
     def home():
         # TODO(Checkpoint Requirement 2 of 3): Change this to use render_template
         # to render main.html on the home page.
-        page_links = [    {"name": "Home", "url": "/"},    {"name": "Pages", "url": "/pages"},    {"name": "About", "url": "/about"}, {"name": "Upload", "url": "/upload"},    {"name": "Login", "url": "/login"},    {"name": "Sign up", "url": "/signup"}]
-        greeting = "Welcome to our Wiki page! We hope you love it here."    
-        # backend.upload("hi dbz","dbz.html")   
-        # backend.upload("hi tekken","tekken.html")  
-        # backend.upload("hi mario","mario.html") 
-        return render_template("main.html", greeting= greeting, page_links = page_links)
+        page_links = [{
+            "name": "Home",
+            "url": "/"
+        }, {
+            "name": "Pages",
+            "url": "/pages"
+        }, {
+            "name": "About",
+            "url": "/about"
+        }, {
+            "name": "Upload",
+            "url": "/upload"
+        }, {
+            "name": "Login",
+            "url": "/login"
+        }, {
+            "name": "Sign up",
+            "url": "/signup"
+        }]
+        greeting = "Welcome to our Wiki page! We hope you love it here."
+        # backend.upload("hi dbz","dbz.html")
+        # backend.upload("hi tekken","tekken.html")
+        # backend.upload("hi mario","mario.html")
+        return render_template("main.html",
+                               greeting=greeting,
+                               page_links=page_links)
 
     # TODO(Project 1): Implement additional routes according to the project requirements.
     @app.route('/pages')
     def index():
         pages = backend.get_all_page_names()
         print(pages)
-        return render_template('pages.html', pages = pages)
+        return render_template('pages.html', pages=pages)
 
     @app.route('/pages/<pagename>')
     def pages(pagename):
@@ -31,7 +51,7 @@ def make_endpoints(app):
         contents = backend.get_wiki_page(file_name)
         if contents is None:
             abort(404)
-        return render_template(pagename+".html", contents=contents)
+        return render_template(pagename + ".html", contents=contents)
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
@@ -44,8 +64,6 @@ def make_endpoints(app):
                 return 'Username already taken!'
         else:
             return render_template('signup.html')
-            
-
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
@@ -63,7 +81,8 @@ def make_endpoints(app):
                 return redirect(url_for('upload'))
             else:
                 # Show error message on login page
-                return render_template('login.html', error='Invalid username or password')
+                return render_template('login.html',
+                                       error='Invalid username or password')
 
         # If GET request, render login page
         return render_template('login.html')
@@ -73,11 +92,10 @@ def make_endpoints(app):
         session.pop('username', None)
         return redirect('/login')
 
-
-    @app.route('/upload',methods =['GET','POST'])
+    @app.route('/upload', methods=['GET', 'POST'])
     def upload_file():
         if request.method == 'POST':
-        # Check if a file was uploaded
+            # Check if a file was uploaded
             if 'file' not in request.files:
                 return redirect(request.url)
             file = request.files['file']
@@ -87,12 +105,13 @@ def make_endpoints(app):
             # Upload the file to GCS
             backend.upload(filepath=file, filename=file.filename)
             return redirect('/')
+
     return render_template('upload.html')
-        
+
     @app.route('/about')
     def about():
         # jabez = "jabez.HEIC"
         jabez_link = backend.get_image('jabez.HEIC')
         #add donald and ivan link when i get their pictures
-        print(jabez_link)        
-        return render_template("about.html",image1_link = jabez_link)
+        print(jabez_link)
+        return render_template("about.html", image1_link=jabez_link)

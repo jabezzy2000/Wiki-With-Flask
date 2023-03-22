@@ -7,8 +7,9 @@ import hashlib
 
 #Define a test class for Backend methods
 
+
 class TestBackend(unittest.TestCase):
-    
+
     # Set up the Backend instance for testing
     @classmethod
     def setUpClass(cls):
@@ -29,7 +30,10 @@ class TestBackend(unittest.TestCase):
     def test_get_all_page_names(self):
         expected_names = ["testfile1.html", "testfile2.html", "testfile3.html"]
         with patch.object(self.backend.bucket, "list_blobs") as mock_list_blobs:
-            mock_list_blobs.return_value = [type('blob', (object,), {'name': f"uploads/{name}"}) for name in expected_names]
+            mock_list_blobs.return_value = [
+                type('blob', (object,), {'name': f"uploads/{name}"})
+                for name in expected_names
+            ]
             page_names = self.backend.get_all_page_names()
         self.assertListEqual(page_names, expected_names)
 
@@ -64,4 +68,3 @@ class TestBackend(unittest.TestCase):
             mock_get_blob.return_value.public_url = expected_url
             url = self.backend.get_image(name_of_image=image_name)
         self.assertEqual(url, expected_url)
-

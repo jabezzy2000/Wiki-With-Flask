@@ -6,8 +6,9 @@ from flaskr.backend import Backend
 from io import BytesIO
 import pytest
 
-# See https://flask.palletsprojects.com/en/2.2.x/testing/ 
+# See https://flask.palletsprojects.com/en/2.2.x/testing/
 # for more info on testing
+
 
 @pytest.fixture
 def app():
@@ -16,12 +17,15 @@ def app():
     })
     return app
 
+
 @pytest.fixture
 def client(app):
     return app.test_client()
 
+
 # TODO(Checkpoint (groups of 4 only) Requirement 4): Change test to
 # match the changes made in the other Checkpoint Requirements.
+
 
 class FlaskTestCase(unittest.TestCase):
 
@@ -37,7 +41,8 @@ class FlaskTestCase(unittest.TestCase):
         # and the presence of a specific string in the response data.
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(b"This project is owned by Jabez, Donald and Ivan.\n", resp.data)
+        self.assertIn(b"This project is owned by Jabez, Donald and Ivan.\n",
+                      resp.data)
 
     def test_pages_index(self):
         # Check if the page index is loaded successfully by mocking the get_all_page_names() function
@@ -72,11 +77,13 @@ class FlaskTestCase(unittest.TestCase):
         # and checking the response status code and the presence of the expected success message in the response data.
         with patch('flaskr.backend.Backend.upload') as mock_upload:
             mock_upload.return_value = True
-            response = self.client.post('/upload', data=dict(
-                html_file=(BytesIO(b'my file contents'), 'test_file.txt')
-            ))
+            response = self.client.post(
+                '/upload',
+                data=dict(html_file=(BytesIO(b'my file contents'),
+                                     'test_file.txt')))
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'test_file.txt has been uploaded successfully!', response.data)
+            self.assertIn(b'test_file.txt has been uploaded successfully!',
+                          response.data)
 
     def test_login(self):
         # Use a mock to simulate sign-in
@@ -84,10 +91,9 @@ class FlaskTestCase(unittest.TestCase):
             # Set the mock to return True to simulate a successful sign-in
             mock_verify.return_value = True
             # Send a POST request with the login information
-            response = self.client.post('/login', data=dict(
-                username='test_user',
-                password='test_password'
-            ))
+            response = self.client.post('/login',
+                                        data=dict(username='test_user',
+                                                  password='test_password'))
             # Check that the response has a redirect status code
             self.assertEqual(response.status_code, 302)
             # Check that the response redirects to the home page
@@ -99,14 +105,14 @@ class FlaskTestCase(unittest.TestCase):
             # Set the mock to return True to simulate successful user creation
             mock_create.return_value = True
             # Send a POST request with the signup information
-            response = self.client.post('/signup', data=dict(
-                username='test_user',
-                password='test_password'
-            ))
+            response = self.client.post('/signup',
+                                        data=dict(username='test_user',
+                                                  password='test_password'))
             # Check that the response has a redirect status code
             self.assertEqual(response.status_code, 302)
             # Check that the response redirects to the login page
-            self.assertEqual(response.headers['Location'], 'http://localhost/login')
+            self.assertEqual(response.headers['Location'],
+                             'http://localhost/login')
 
     def test_logout(self):
         # Use a mock to simulate sign-in
@@ -122,4 +128,5 @@ class FlaskTestCase(unittest.TestCase):
                 # Check that the response has a redirect status code
                 self.assertEqual(response.status_code, 302)
                 # Check that the response redirects to the home page
-                self.assertEqual(response.headers['Location'], 'http://localhost/')
+                self.assertEqual(response.headers['Location'],
+                                 'http://localhost/')
