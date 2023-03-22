@@ -28,7 +28,7 @@ class Backend:
         pass
 
     def sign_up(self,username,password):
-        blob = self.bucket.blob(f"users/{username}")
+        blob = self.bucket.blob(f"dijproject_users_and_passwords/users/{username}")
         if blob.exists():
             return False
         hashed_pass = self._hash_password(password)
@@ -36,7 +36,7 @@ class Backend:
         return True
 
     def sign_in(self,username,password):
-        blob = self.bucket.get_blob(f"users/{username}")
+        blob = self.bucket.get_blob(f"dijproject_users_and_passwords/users/{username}")
         if blob is None:
             return False
         hashed_password = blob.download_as_text().strip()
