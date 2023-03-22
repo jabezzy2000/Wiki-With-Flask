@@ -130,3 +130,6 @@ class FlaskTestCase(unittest.TestCase):
                 # Check that the response redirects to the home page
                 self.assertEqual(response.headers['Location'],
                                  'http://localhost/')
+
+
+            #testing unitttest
