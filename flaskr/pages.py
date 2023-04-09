@@ -42,7 +42,6 @@ def make_endpoints(app):
     @app.route('/pages')
     def index():
         pages = backend.get_all_page_names()
-        print(pages)
         return render_template('pages.html', pages=pages)
 
     @app.route('/pages/<pagename>')
@@ -51,7 +50,7 @@ def make_endpoints(app):
         contents = backend.get_wiki_page(file_name)
         if contents is None:
             abort(404)
-        return render_template(pagename + ".html", contents=contents)
+        return render_template('pagename')
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
@@ -114,3 +113,16 @@ def make_endpoints(app):
         #add donald and ivan link when i get their pictures
         print(jabez_link)
         return render_template("about.html", image1_link=jabez_link)
+
+    @app.route('/search')
+    def search():
+        query = request.args.get('q')
+        matches = []
+        all_pages = backend.get_all_page_names()
+        if query:
+            for page in all_pages:
+                if query in page or query.lower() in page or query.upper() in page:
+                    matches.append(page)
+        return render_template('search_results.html', query=query, matches=matches)
+
+    
