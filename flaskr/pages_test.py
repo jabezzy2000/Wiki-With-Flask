@@ -114,6 +114,8 @@ class FlaskTestCase(unittest.TestCase):
     #         self.assertEqual(response.headers['Location'],
     #                          'http://localhost/login')
 
+
+
     # def test_logout(self):
     #     # Use a mock to simulate sign-in
     #     with patch('flaskr.backend.Backend.sign_in') as mock_verify:
