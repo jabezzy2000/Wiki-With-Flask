@@ -105,8 +105,7 @@ def make_endpoints(app):
             # Upload the file to GCS
             backend.upload(filepath=file, filename=file.filename)
             return redirect('/')
-
-    return render_template('upload.html')
+        return render_template('upload.html')
 
     @app.route('/about')
     def about():
