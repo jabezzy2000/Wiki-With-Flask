@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, abort, redirect, url_for, session, flash
 from flaskr.backend import Backend
+import os
 
 
 def make_endpoints(app):
@@ -46,11 +47,19 @@ def make_endpoints(app):
 
     @app.route('/pages/<pagename>')
     def pages(pagename):
-        file_name = f"uploads/{pagename}"
+        file_name = f"{pagename}"
         contents = backend.get_wiki_page(file_name)
         if contents is None:
             abort(404)
-        return render_template('pagename')
+
+            # create a new template file in the templates directory
+        template_path = os.path.join(app.root_path, 'templates', f"{pagename}.html")
+        with open(template_path, 'w') as f:
+            f.write(contents)
+
+    # render the newly created template file
+        return render_template(f"{pagename}.html")            
+        # return render_template(contents)
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
@@ -93,18 +102,36 @@ def make_endpoints(app):
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload_file():
+        UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
         if request.method == 'POST':
             # Check if a file was uploaded
-            if 'file' not in request.files:
+            if 'html_file' not in request.files:
                 return redirect(request.url)
-            file = request.files['file']
-            # Check if the file is empty
-            if file.filename == '':
-                return redirect(request.url)
-            # Upload the file to GCS
-            backend.upload(filepath=file, filename=file.filename)
-            return redirect('/')
+            file = request.files['html_file']
+            filename = request.form['file_name']
+            category = request.form['category']
+            author = request.form['author']
+
+        # Save the file to a temporary directory on the server
+            filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+            file.save(filepath)
+
+        # Rename the file and update the file variable
+            new_filename = f"{filename}_{category}_{author}.html"
+            os.rename(filepath, os.path.join(UPLOAD_FOLDER, new_filename))
+            filepath = os.path.join(UPLOAD_FOLDER, new_filename)
+
+        # Upload the file to GCS
+            success, message = backend.upload(filepath=filepath, filename=new_filename)
+            if success:
+               return render_template('upload.html', message=message)
+            else:
+                return render_template('upload.html', message=message)
+
         return render_template('upload.html')
+
 
     @app.route('/about')
     def about():
@@ -117,12 +144,23 @@ def make_endpoints(app):
     @app.route('/search')
     def search():
         query = request.args.get('q')
-        matches = []
+        category = request.args.get('category')
+        author = request.args.get('author')
+        rating = request.args.get('rating')
+        matches = {}
         all_pages = backend.get_all_page_names()
         if query:
             for page in all_pages:
                 if query in page or query.lower() in page or query.upper() in page:
-                    matches.append(page)
+                    matches[page.split("_")[0]] = page
+        if category:
+            for key in matches.copy():
+                if category not in key and category != key:
+                    del matches[key]
+        if author:
+            for key in matches.copy():
+                if author not in key and author != key:
+                    del matches[key]
         return render_template('search_results.html', query=query, matches=matches)
 
     
