@@ -35,7 +35,7 @@ lint: # a job for code linting
   stage: build
   script:
     - pip install yapf
-    - yapf --style google --recursive --diff .
+    - yapf --style google -i --recursive .
   only:
     - merge_requests
 
