@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, abort, redirect, url_for, session, flash
+from flask import render_template, request, abort
 from flaskr.backend import Backend
 import os
 
@@ -12,32 +12,12 @@ def make_endpoints(app):
     def home():
         # TODO(Checkpoint Requirement 2 of 3): Change this to use render_template
         # to render main.html on the home page.
-        page_links = [{
-            "name": "Home",
-            "url": "/"
-        }, {
-            "name": "Pages",
-            "url": "/pages"
-        }, {
-            "name": "About",
-            "url": "/about"
-        }, {
-            "name": "Upload",
-            "url": "/upload"
-        }, {
-            "name": "Login",
-            "url": "/login"
-        }, {
-            "name": "Sign up",
-            "url": "/signup"
-        }]
-        greeting = "Welcome to our Wiki page! We hope you love it here."
-        # backend.upload("hi dbz","dbz.html")
-        # backend.upload("hi tekken","tekken.html")
-        # backend.upload("hi mario","mario.html")
-        return render_template("main.html",
-                               greeting=greeting,
-                               page_links=page_links)
+        page_links = [    {"name": "Home", "url": "/"},    {"name": "Pages", "url": "/pages"},    {"name": "About", "url": "/about"}, {"name": "Upload", "url": "/upload"},    {"name": "Login", "url": "/login"},    {"name": "Sign up", "url": "/signup"}]
+        greeting = "Welcome to our Wiki page! We hope you love it here."    
+        # backend.upload("hi dbz","dbz.html")   
+        # backend.upload("hi tekken","tekken.html")  
+        # backend.upload("hi mario","mario.html") 
+        return render_template("main.html", greeting= greeting, page_links = page_links)
 
     # TODO(Project 1): Implement additional routes according to the project requirements.
     @app.route('/pages')
@@ -63,34 +43,14 @@ def make_endpoints(app):
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
-        if request.method == 'POST':
-            username = request.form['username']
-            password = request.form['password']
-            if backend.sign_up(username, password):
-                return 'Sign up successful!'
-            else:
-                return 'Username already taken!'
-        else:
-            return render_template('signup.html')
+            return render_template("signup.html")
+
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
-        if request.method == 'POST':
-            # Get username and password from form data
-            username = request.form['username']
-            password = request.form['password']
+            return render_template("login.html")
 
-            # Check if user exists and if password matches
-            if backend.sign_in(username, password):
-                # Set session variable to store username
-                session['username'] = username
 
-                # Redirect to upload page
-                return redirect(url_for('upload'))
-            else:
-                # Show error message on login page
-                return render_template('login.html',
-                                       error='Invalid username or password')
 
         # If GET request, render login page
         return render_template('login.html')
