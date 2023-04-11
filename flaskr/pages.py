@@ -12,12 +12,32 @@ def make_endpoints(app):
     def home():
         # TODO(Checkpoint Requirement 2 of 3): Change this to use render_template
         # to render main.html on the home page.
-        page_links = [    {"name": "Home", "url": "/"},    {"name": "Pages", "url": "/pages"},    {"name": "About", "url": "/about"}, {"name": "Upload", "url": "/upload"},    {"name": "Login", "url": "/login"},    {"name": "Sign up", "url": "/signup"}]
-        greeting = "Welcome to our Wiki page! We hope you love it here."    
-        # backend.upload("hi dbz","dbz.html")   
-        # backend.upload("hi tekken","tekken.html")  
-        # backend.upload("hi mario","mario.html") 
-        return render_template("main.html", greeting= greeting, page_links = page_links)
+        page_links = [{
+            "name": "Home",
+            "url": "/"
+        }, {
+            "name": "Pages",
+            "url": "/pages"
+        }, {
+            "name": "About",
+            "url": "/about"
+        }, {
+            "name": "Upload",
+            "url": "/upload"
+        }, {
+            "name": "Login",
+            "url": "/login"
+        }, {
+            "name": "Sign up",
+            "url": "/signup"
+        }]
+        greeting = "Welcome to our Wiki page! We hope you love it here."
+        # backend.upload("hi dbz","dbz.html")
+        # backend.upload("hi tekken","tekken.html")
+        # backend.upload("hi mario","mario.html")
+        return render_template("main.html",
+                               greeting=greeting,
+                               page_links=page_links)
 
     # TODO(Project 1): Implement additional routes according to the project requirements.
     @app.route('/pages')
@@ -44,17 +64,13 @@ def make_endpoints(app):
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
-            return render_template("signup.html")
-
+        return render_template("signup.html")
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
-            return render_template("login.html")
+        return render_template("login.html")
 
-
-
-        # If GET request, render login page
-        return render_template('login.html')
+    # If GET request, render login page
 
     @app.route("/logout", methods=['POST'])
     def logout():
