@@ -53,12 +53,13 @@ def make_endpoints(app):
             abort(404)
 
             # create a new template file in the templates directory
-        template_path = os.path.join(app.root_path, 'templates', f"{pagename}.html")
+        template_path = os.path.join(app.root_path, 'templates',
+                                     f"{pagename}.html")
         with open(template_path, 'w') as f:
             f.write(contents)
 
     # render the newly created template file
-        return render_template(f"{pagename}.html")            
+        return render_template(f"{pagename}.html")
         # return render_template(contents)
 
     @app.route("/signup", methods=["GET", "POST"])
@@ -102,7 +103,8 @@ def make_endpoints(app):
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload_file():
-        UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+        UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                     'uploads')
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
         if request.method == 'POST':
@@ -114,24 +116,24 @@ def make_endpoints(app):
             category = request.form['category']
             author = request.form['author']
 
-        # Save the file to a temporary directory on the server
+            # Save the file to a temporary directory on the server
             filepath = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(filepath)
 
-        # Rename the file and update the file variable
+            # Rename the file and update the file variable
             new_filename = f"{filename}_{category}_{author}.html"
             os.rename(filepath, os.path.join(UPLOAD_FOLDER, new_filename))
             filepath = os.path.join(UPLOAD_FOLDER, new_filename)
 
-        # Upload the file to GCS
-            success, message = backend.upload(filepath=filepath, filename=new_filename)
+            # Upload the file to GCS
+            success, message = backend.upload(filepath=filepath,
+                                              filename=new_filename)
             if success:
-               return render_template('upload.html', message=message)
+                return render_template('upload.html', message=message)
             else:
                 return render_template('upload.html', message=message)
 
         return render_template('upload.html')
-
 
     @app.route('/about')
     def about():
@@ -151,7 +153,8 @@ def make_endpoints(app):
         all_pages = backend.get_all_page_names()
         if query:
             for page in all_pages:
-                if query in page or query.lower() in page or query.upper() in page:
+                if query in page or query.lower() in page or query.upper(
+                ) in page:
                     matches[page.split("_")[0]] = page
         if category:
             for key in matches.copy():
@@ -161,6 +164,6 @@ def make_endpoints(app):
             for key in matches.copy():
                 if author not in key and author != key:
                     del matches[key]
-        return render_template('search_results.html', query=query, matches=matches)
-
-    
+        return render_template('search_results.html',
+                               query=query,
+                               matches=matches)
