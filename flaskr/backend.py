@@ -1,11 +1,11 @@
 # TODO(Project 1): Implement Backend according to the requirements.
 from google.cloud import storage
+from google.cloud.exceptions import NotFound, Forbidden, Conflict
 from base64 import b64encode
 import hashlib
 import os
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "dijproject-d5a5f3cc6a38.json"
-
 
 
 class Backend:
@@ -39,13 +39,18 @@ class Backend:
 
     # Method to upload a file to the bucket
     def upload(self, filepath, filename):
-        blob = self.bucket.blob(
-            f"uploads/{filename}"
-        )  # Get the blob object reference for the file to upload
-        blob.upload_from_filename(
-            filepath,
-            content_type='text/html')  # Upload the file to the blob object
-        pass
+        try:
+            blob = self.bucket.blob(f"uploads/{filename}")
+            blob.upload_from_filename(filepath, content_type='text/html')
+            return True, "Upload successful"
+        except NotFound:
+            return False, "Bucket not found"
+        except Forbidden:
+            return False, "Access to bucket denied"
+        except Conflict:
+            return False, "A file with the same name already exists in the bucket"
+        except Exception as e:
+            return False, f"An error occurred during upload: {e}"
 
     # Method to sign up a user with the given username and password
     def sign_up(self, username, password):

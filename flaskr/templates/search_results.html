@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Search Results</title>
+</head>
+
+<body>
+    <h1>Search Results for "{{ query }}"</h1>
+    {% if matches %}
+    <ul>
+        {% for name, full_name in matches.items() %}
+        <li><a href="{{ url_for("pages", pagename=full_name)}}">{{ name }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No results found.</p>
+    {% endif %}
+</body>
+
+</html>

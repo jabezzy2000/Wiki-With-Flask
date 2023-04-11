@@ -1,33 +1,62 @@
+# image: python:3
+# lint:
+#  stage: build
+#  script:
+#  - pip install yapf
+#  - yapf --style google --recursive --diff .
+#  only:
+#  - merge_requests
+
+# unittest:
+#  stage: test
+#  script:
+#   - pip install -r requirements.txt
+#   - pytest .
+#  only:
+#   - merge_requests
+
+# prod:
+#  image: google/cloud-sdk:alpine
+#  stage: deploy
+#  needs: 
+#  - pipeline: test
+#    job: unittest
+#  environment: Production
+#  only:
+#  - main
+#  script:
+#  - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
+#  - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+#  - gcloud --quiet --project $PROJECT_ID app deploy  
+
 image: python:3
-lint:
- stage: test
- script:
- - pip install yapf
- - yapf --style google --recursive --diff .
- only:
- - merge_requests
 
-unittest:
- stage: test
- needs: 
-  - pipeline: test
-    job: lint
- script:
-  - pip install -r requirements.txt
-  - pytest .
- only:
-  - merge_requests
+lint: # a job for code linting
+  stage: build
+  script:
+    - pip install yapf
+    - yapf --style google -i --recursive .
+  only:
+    - merge_requests
 
-prod:
- image: google/cloud-sdk:alpine
- stage: deploy
- needs: 
- - pipeline: test
-   job: unittest
- environment: Production
- only:
- - main
- script:
- - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
- - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
- - gcloud --quiet --project $PROJECT_ID app deploy  
+unittest: # a job for running unit tests
+  stage: test
+  script:
+    - pip install -r requirements.txt
+    - pytest .
+  only:
+    - merge_requests
+
+prod: # a job for deploying the application to production
+  image: google/cloud-sdk:alpine
+  stage: deploy
+  needs:
+    - pipeline: test
+      job: unittest
+  environment: Production
+  only:
+    - main
+  script:
+    - echo $SERVICE_ACCOUNT > /tmp/$CI_PIPELINE_ID.json
+    - gcloud auth activate-service-account --key-file /tmp/$CI_PIPELINE_ID.json
+    - gcloud --quiet --project $PROJECT_ID app deploy
