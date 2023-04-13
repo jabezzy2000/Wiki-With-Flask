@@ -1,4 +1,4 @@
-from flask import render_template, request, abort
+from flask import render_template, request, abort,session
 from flaskr.backend import Backend
 import os
 
@@ -9,7 +9,7 @@ def make_endpoints(app):
     # Flask uses the "app.route" decorator to call methods when users
     # go to a specific route on the project's website.
     @app.route("/")
-    def home():
+    def home(message=""):
         # TODO(Checkpoint Requirement 2 of 3): Change this to use render_template
         # to render main.html on the home page.
         page_links = [{
@@ -35,9 +35,12 @@ def make_endpoints(app):
         # backend.upload("hi dbz","dbz.html")
         # backend.upload("hi tekken","tekken.html")
         # backend.upload("hi mario","mario.html")
+        username = session.get("username")  # Get the username from the session if the user is logged in
         return render_template("main.html",
+                               messsage = message,
                                greeting=greeting,
-                               page_links=page_links)
+                               page_links=page_links,
+                               username = username)
 
     # TODO(Project 1): Implement additional routes according to the project requirements.
     @app.route('/pages')
@@ -64,11 +67,36 @@ def make_endpoints(app):
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
-        return render_template("signup.html")
+        if request.method == "POST":
+            username = request.form["username"]
+            email = request.form["email"]
+            password = request.form["password"]
+            confirm_password = request.form["confirm_password"]
+            if password != confirm_password:
+                return "Passwords do not match"
+            if backend.sign_up(username, password):
+                return render_template("main.html", message="Signed up successfully!")
+            else:
+                return "Username already exists"
+        else:
+            return render_template("signup.html")
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
-        return render_template("login.html")
+        if request.method == "POST":
+            username = request.form["username"]
+            password = request.form["password"]
+            if backend.sign_in(username, password):
+                page_links = [{ "name": "Home", "url": "/"  }, {    "name": "Pages",    "url": "/pages" }, {  "name": "About",   "url": "/about" }, 
+                {"name": "Upload", "url": "/upload" }, { "name": "Logout","url": "/logout"}]
+                session['logged_in'] = True
+                session['username'] = username
+                return render_template("main.html", message="Logged in successfully!", page_links = page_links, username = username)
+            else:
+                return render_template("login.html", error="Incorrect username or password")
+        else:
+            return render_template("login.html")
+
 
     # If GET request, render login page
 
