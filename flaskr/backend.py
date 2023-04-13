@@ -3,6 +3,7 @@ from google.cloud import storage
 from google.cloud.exceptions import NotFound, Forbidden, Conflict
 from base64 import b64encode
 import hashlib
+import json
 import os
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "dijproject-d5a5f3cc6a38.json"
@@ -105,3 +106,44 @@ class Backend:
 
         """
         return hashlib.sha256(password.encode()).hexdigest()
+
+    def add_comment(self, pagename, username, comment):
+        """Adds a comment to a page.
+
+        Args:
+            pagename (str): The name of the page to add the comment to.
+            username (str): The username of the person who made the comment.
+            comment (str): The comment to add.
+        """
+        comments_blob = self.bucket.blob(f"comments/{pagename}")
+        existing_comments = []
+
+        if comments_blob.exists():
+            existing_comments = json.loads(comments_blob.download_as_text())
+
+        existing_comments.append({"username": username, "comment": comment})
+        comments_blob.upload_from_string(json.dumps(existing_comments))
+
+    def get_comments(self, pagename):
+        """Retrieves the comments for a page.
+
+        Args:
+            pagename (str): The name of the page to retrieve the comments for.
+
+        Returns:
+            List[Dict[str, str]]: A list of comments, where each comment is a dictionary containing the keys "username" and "comment".
+        """
+        comments_blob = self.bucket.get_blob(f"comments/{pagename}")
+        if comments_blob is None:
+            return []
+        
+        comments_text = comments_blob.download_as_text().strip()
+        if not comments_text:
+            return []
+
+        try:
+            comments = json.loads(comments_text)
+        except json.JSONDecodeError:
+            comments = []
+
+        return comments

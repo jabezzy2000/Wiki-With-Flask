@@ -1,4 +1,4 @@
-from flask import render_template, request, abort
+from flask import render_template, request, abort, redirect, session, url_for
 from flaskr.backend import Backend
 import os
 
@@ -45,22 +45,54 @@ def make_endpoints(app):
         pages = backend.get_all_page_names()
         return render_template('pages.html', pages=pages)
 
-    @app.route('/pages/<pagename>')
+    @app.route('/pages/<pagename>', methods = ['GET', 'POST'])
     def pages(pagename):
         file_name = f"{pagename}"
         contents = backend.get_wiki_page(file_name)
         if contents is None:
             abort(404)
 
-            # create a new template file in the templates directory
+        # create a new template file in the templates directory
         template_path = os.path.join(app.root_path, 'templates',
                                      f"{pagename}.html")
         with open(template_path, 'w') as f:
-            f.write(contents)
+            comments_section = '''
+                <div id="comments-section">
+                    <h3>Comments</h3>
+                    {% if comments %}
+                        <ul>
+                            {% for comment in comments %}
+                                <li><b>{{ comment.username }}:</b> {{ comment.comment }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
 
-    # render the newly created template file
-        return render_template(f"{pagename}.html")
-        # return render_template(contents)
+                    {% if 'username' in session %}
+                        <h4>Add a comment</h4>
+                        <form method="POST">
+                            <textarea name="comment" rows="4" cols="50" required></textarea><br>
+                            <input type="submit" value="Submit">
+                        </form>
+                    {% else %}
+                        <p>You must <a href="{{ url_for('login') }}">log in</a> to post a comment.</p>
+                    {% endif %}
+                </div>
+            '''
+            f.write(contents + comments_section)
+        
+        if request.method == 'POST':
+            if 'username' in session:
+                comment = request.form['comment']
+                backend.add_comment(pagename, session['username'], comment)
+                return redirect(url_for('pages', pagename=pagename))
+            else:
+                return redirect(url_for('login'))
+
+        comments = backend.get_comments(pagename)
+        return render_template(f"{pagename}.html", comments=comments)
+       
 
     @app.route("/signup", methods=["GET", "POST"])
     def signup():
