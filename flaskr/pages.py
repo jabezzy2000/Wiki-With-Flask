@@ -95,7 +95,7 @@ def make_endpoints(app):
                 return redirect(url_for('login'))
 
         comments = backend.get_comments(pagename)
-        return render_template(f"{pagename}.html", comments=comments)
+        return render_template(f"{pagename}", comments=comments)
        
 
     @app.route("/signup", methods=["GET", "POST"])
@@ -193,6 +193,9 @@ def make_endpoints(app):
                 if query in page or query.lower() in page or query.upper(
                 ) in page:
                     matches[page.split("_")[0]] = page
+        else:
+            for page in all_pages:
+                matches[page.split("_")[0]] = page
         if category:
             for key in matches.copy():
                 if category not in key and category != key:
