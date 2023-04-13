@@ -11,3 +11,27 @@
     <p>The Budokai Tenkaichi series has been praised for its faithful adaptation of the Dragon Ball franchise, its fast-paced gameplay, and its expansive roster of characters. The games have sold millions of copies worldwide and remain popular among Dragon Ball fans to this day. Whether you're a fan of the anime or just a fighting game enthusiast, Budokai Tenkaichi is a series that's definitely worth checking out.</p>
   </body>
 </html>
+
+                <div id="comments-section">
+                    <h3>Comments</h3>
+                    {% if comments %}
+                        <ul>
+                            {% for comment in comments %}
+                                <li><b>{{ comment.username }}:</b> {{ comment.comment }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
+
+                    {% if 'username' in session %}
+                        <h4>Add a comment</h4>
+                        <form method="POST">
+                            <textarea name="comment" rows="4" cols="50" required></textarea><br>
+                            <input type="submit" value="Submit">
+                        </form>
+                    {% else %}
+                        <p>You must <a href="{{ url_for('login') }}">log in</a> to post a comment.</p>
+                    {% endif %}
+                </div>
+            
