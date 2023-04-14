@@ -108,17 +108,21 @@ def make_endpoints(app):
             if password != confirm_password:
                 return "Passwords do not match"
             if backend.sign_up(username, password):
-                return render_template("main.html", message="Signed up successfully!")
+                return login(username,password)
             else:
                 return "Username already exists"
         else:
             return render_template("signup.html")
 
     @app.route("/login", methods=["GET", "POST"])
-    def login():
+    def login(user = None, passw = None):
         if request.method == "POST":
-            username = request.form["username"]
-            password = request.form["password"]
+            if user and passw:
+                username = user
+                password = passw
+            else:
+                username = request.form["username"]
+                password = request.form["password"]
             if backend.sign_in(username, password):
                 page_links = [{ "name": "Home", "url": "/"  }, {    "name": "Pages",    "url": "/pages" }, {  "name": "About",   "url": "/about" }, 
                 {"name": "Upload", "url": "/upload" }, { "name": "Logout","url": "/logout"}]
@@ -133,10 +137,10 @@ def make_endpoints(app):
 
     # If GET request, render login page
 
-    @app.route("/logout", methods=['POST'])
+    @app.route("/logout", methods=['POST','GET'])
     def logout():
         session.pop('username', None)
-        return redirect('/login')
+        return home()
 
     @app.route('/upload', methods=['GET', 'POST'])
     def upload_file():

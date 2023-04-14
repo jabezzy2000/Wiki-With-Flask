@@ -109,7 +109,9 @@
         {% for page_link in page_links %}
         <li><a href="{{ page_link.url }}">{{ page_link.name }}</a></li>
         {% endfor %}
+        {% if username %}
         <li><p class="username">Logged in as {{ username }}</p></li>
+        {% endif %}
     </ul>
 
     <form action="/search" method="GET">
