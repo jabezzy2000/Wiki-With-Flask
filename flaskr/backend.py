@@ -119,7 +119,10 @@ class Backend:
         existing_comments = []
 
         if comments_blob.exists():
-            existing_comments = json.loads(comments_blob.download_as_text())
+            try:
+                existing_comments = json.loads(comments_blob.download_as_text())
+            except json.JSONDecodeError:
+                existing_comments = []
 
         existing_comments.append({"username": username, "comment": comment})
         comments_blob.upload_from_string(json.dumps(existing_comments))

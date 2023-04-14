@@ -2,7 +2,62 @@
 <html>
   <head>
     <title>Naruto Uzumaki</title>
-  </head>
+  
+        <style>
+    #comments-section {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f8f8f8;
+    }
+
+    #comments-section h3,
+    #comments-section h4 {
+        margin-bottom: 10px;
+    }
+
+    #comments-section ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #comments-section li {
+        border-bottom: 1px solid #eee;
+        padding: 8px 0;
+    }
+
+    #comments-section li:last-child {
+        border-bottom: none;
+    }
+
+    #comments-section textarea {
+        width: 100%;
+        padding: 5px;
+        resize: none;
+        font-family: inherit;
+        font-size: 14px;
+        border: 1px solid #ccc;
+    }
+
+    #comments-section input[type="submit"] {
+        font-family: inherit;
+        font-size: 14px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    #comments-section input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+        </head>
   <body>
     <h1>Naruto Uzumaki</h1>
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Naruto_Uzumaki.svg/1200px-Naruto_Uzumaki.svg.png" alt="Naruto Uzumaki">
@@ -17,3 +72,27 @@
     <img src="https://vignette.wikia.nocookie.net/naruto/images/c/c8/Naruto_and_Iruka.PNG/revision/latest/scale-to-width-down/340?cb=20130707140403" alt="Naruto with his teacher, Iruka Umino">
     <p>Naruto's first friend and mentor was Iruka Umino, his academy teacher. Iruka saw potential in Naruto and encouraged him to work hard and never give up. Naruto looked up to Iruka as a father figure and was devastated when he thought Iruka had died during the invasion of Konoha by Orochimaru and his forces.</p>
     <p>After Iruka's supposed death, Naruto continued to train and make new friends, including Sasuke Uchiha and Sakura Haruno. Together, they formed Team 7 under the guidance of Kakashi Hatake. Naruto's relationship with Sasuke was complicated, as they often clashed due to their opposing personalities and goals. However, Naruto never gave up on Sasuke and continued
+
+                <div id="comments-section">
+                    <h3>Comments</h3>
+                    {% if comments %}
+                        <ul>
+                            {% for comment in comments %}
+                                <li><b>{{ comment.username }}:</b> {{ comment.comment }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
+
+                    {% if 'username' in session %}
+                        <h4>Add a comment</h4>
+                        <form method="POST">
+                            <textarea name="comment" rows="4" cols="50" required></textarea><br>
+                            <input type="submit" value="Submit">
+                        </form>
+                    {% else %}
+                        <p>You must <a href="{{ url_for('login') }}">log in</a> to post a comment.</p>
+                    {% endif %}
+                </div>
+            

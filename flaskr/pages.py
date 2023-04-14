@@ -56,6 +56,65 @@ def make_endpoints(app):
         if contents is None:
             abort(404)
 
+        css_styles = '''
+        <style>
+    #comments-section {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f8f8f8;
+    }
+
+    #comments-section h3,
+    #comments-section h4 {
+        margin-bottom: 10px;
+    }
+
+    #comments-section ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #comments-section li {
+        border-bottom: 1px solid #eee;
+        padding: 8px 0;
+    }
+
+    #comments-section li:last-child {
+        border-bottom: none;
+    }
+
+    #comments-section textarea {
+        width: 100%;
+        padding: 5px;
+        resize: none;
+        font-family: inherit;
+        font-size: 14px;
+        border: 1px solid #ccc;
+    }
+
+    #comments-section input[type="submit"] {
+        font-family: inherit;
+        font-size: 14px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    #comments-section input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+        '''
+        head_close_pos = contents.find('</head>')
+
+        contents = contents[:head_close_pos] + css_styles + contents[head_close_pos:]
         # create a new template file in the templates directory
         template_path = os.path.join(app.root_path, 'templates',
                                      f"{pagename}.html")
@@ -188,6 +247,10 @@ def make_endpoints(app):
         rating = request.args.get('rating')
         matches = {}
         all_pages = backend.get_all_page_names()
+
+        if not query:
+            return redirect(url_for('index'))
+
         if query:
             for page in all_pages:
                 if query in page or query.lower() in page or query.upper(
@@ -204,3 +267,4 @@ def make_endpoints(app):
         return render_template('search_results.html',
                                query=query,
                                matches=matches)
+    
