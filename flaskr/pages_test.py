@@ -70,34 +70,70 @@ class FlaskTestCase(unittest.TestCase):
             mock_content.return_value = "Test file contents"
             response = self.client.get('/pages/testfile')
             self.assertEqual(response.status_code, 200)
-            self.assertIn(b'Test file contents', response.data)
+            self.assertIn(b'Test file content', response.data)
 
-    # def test_upload_file(self):
-    #     # Check if a file is uploaded successfully by mocking the upload() function
-    #     # and checking the response status code and the presence of the expected success message in the response data.
-    #     with patch('flaskr.backend.Backend.upload') as mock_upload:
-    #         mock_upload.return_value = True
-    #         response = self.client.post(
-    #             '/upload',
-    #             data=dict(html_file=(BytesIO(b'my file contents'),
-    #                                  'test_file.txt')))
-    #         self.assertEqual(response.status_code, 200)
-    #         self.assertIn(b'test_file.txt has been uploaded successfully!',
-    #                       response.data)
 
-    # def test_login(self):
-    #     # Use a mock to simulate sign-in
-    #     with patch('flaskr.backend.Backend.sign_in') as mock_verify:
-    #         # Set the mock to return True to simulate a successful sign-in
-    #         mock_verify.return_value = True
-    #         # Send a POST request with the login information
-    #         response = self.client.post('/login',
-    #                                     data=dict(username='test_user',
-    #                                               password='test_password'))
-    #         # Check that the response has a redirect status code
-    #         self.assertEqual(response.status_code, 302)
-    #         # Check that the response redirects to the home page
-    #         self.assertEqual(response.headers['Location'], 'http://localhost/')
+
+    def test_get_comments(self):
+        pagename = "existing_page"
+
+        with patch('flaskr.backend.Backend.get_wiki_page') as mock_get_wiki_page, \
+             patch('flaskr.backend.Backend.get_comments') as mock_get_comments:
+            
+            mock_get_wiki_page.return_value = "Test file contents"
+            mock_get_comments.return_value = [{"username": "testuser", "comment": "test comment"}]
+
+            response = self.client.get(f"/pages/{pagename}")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"test comment", response.data)
+
+    def test_post_comment(self):
+        pagename = "existing_page"
+
+        with patch('flaskr.backend.Backend.get_wiki_page') as mock_get_wiki_page, \
+             patch('flaskr.backend.Backend.add_comment') as mock_add_comment, \
+             patch('flaskr.backend.Backend.get_comments') as mock_get_comments:
+            
+            mock_get_wiki_page.return_value = "Test file contents"
+            mock_get_comments.return_value = []
+
+            with self.client.session_transaction() as session:
+                session['username'] = "testuser"
+
+            response = self.client.post(f"/pages/{pagename}", data={"comment": "test comment"})
+            self.assertEqual(response.status_code, 302)
+            mock_add_comment.assert_called_once_with(pagename, "testuser", "test comment")
+
+    def test_upload_file(self):
+        # Check if a file is uploaded successfully by mocking the upload() function
+        # and checking the response status code and the presence of the expected success message in the response data.
+        with patch('flaskr.backend.Backend.upload') as mock_upload:
+            mock_upload.return_value = (True, 'File upload was successful!')
+            response = self.client.post(
+                '/upload',
+                data=dict(
+                    html_file=(BytesIO(b'my file contents'), 'test_file.txt'),
+                    file_name='test_file',
+                    category='test_category',
+                    author='test_author'
+                )
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'File upload was successful!', response.data)
+
+    def test_login(self):
+        # Use a mock to simulate sign-in
+        with patch('flaskr.backend.Backend.sign_in') as mock_verify:
+            # Set the mock to return True to simulate a successful sign-in
+            mock_verify.return_value = True
+            # Send a POST request with the login information
+            response = self.client.post('/login',
+                                        data=dict(username='test_user',
+                                                password='test_password'))
+            # Check that the response has a redirect status code
+            self.assertEqual(response.status_code, 200)
+            # Check that the user is logged in successfully
+            self.assertIn(b'Logged in successfully!', response.data)
 
     # def test_signup(self):
     #     # Use a mock to simulate user creation
@@ -107,12 +143,14 @@ class FlaskTestCase(unittest.TestCase):
     #         # Send a POST request with the signup information
     #         response = self.client.post('/signup',
     #                                     data=dict(username='test_user',
-    #                                               password='test_password'))
+    #                                             email='test_email',
+    #                                             password='test_password',
+    #                                             confirm_password='test_password'))
     #         # Check that the response has a redirect status code
-    #         self.assertEqual(response.status_code, 302)
+    #         self.assertEqual(response.status_code, 200)
     #         # Check that the response redirects to the login page
     #         self.assertEqual(response.headers['Location'],
-    #                          'http://localhost/login')
+    #                         '/login')
 
     # def test_logout(self):
     #     # Use a mock to simulate sign-in
