@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from flask import Flask, url_for
 from flaskr.backend import Backend
 from io import BytesIO
+from urllib.parse import urlparse
 import pytest
 
 # See https://flask.palletsprojects.com/en/2.2.x/testing/
@@ -196,4 +197,27 @@ class FlaskTestCase(unittest.TestCase):
             # Test search with an author
             response = self.client.get('/search', query_string={'q': 'page', 'author': 'author1'})
             self.assertEqual(response.status_code, 200)
+    
+    
+    def test_logout(self):
+        # Log in the user by setting the session variable
+        with self.client.session_transaction() as session:
+            session['username'] = 'testuser'
+
+        # Log out the user by sending a GET request to the logout route
+        response = self.client.get('/logout')
+
+        # Check that the response has a redirect status code
+        self.assertEqual(response.status_code, 302)
+
+        # Create an application context to use url_for
+        with self.app.test_request_context():
+            # Check that the response redirects to the login page
+            expected_location = urlparse(url_for('login', _external=True)).path
+            actual_location = urlparse(response.headers['Location']).path
+            self.assertEqual(actual_location, expected_location)
+
+        # Check that the user session is cleared
+        with self.client.session_transaction() as session:
+            self.assertNotIn('username', session)
 

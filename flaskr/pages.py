@@ -31,6 +31,9 @@ def make_endpoints(app):
         }, {
             "name": "Sign up",
             "url": "/signup"
+        }, {
+            "name": "Logout",
+            "url": "/logout"
         }]
         greeting = "Welcome to our Wiki page! We hope you love it here."
         # backend.upload("hi dbz","dbz.html")
@@ -196,11 +199,6 @@ def make_endpoints(app):
 
     # If GET request, render login page
 
-    @app.route("/logout", methods=['POST','GET'])
-    def logout():
-        session.pop('username', None)
-        return home()
-
     @app.route('/upload', methods=['GET', 'POST'])
     def upload_file():
         UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -274,4 +272,11 @@ def make_endpoints(app):
         return render_template('search_results.html',
                                query=query,
                                matches=matches)
+        
+    @app.route('/logout')
+    def logout():
+        # Clear the user session
+        session.clear()
+        # Redirect to the home page
+        return redirect(url_for('login'))
     
