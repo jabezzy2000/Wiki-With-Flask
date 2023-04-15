@@ -135,36 +135,65 @@ class FlaskTestCase(unittest.TestCase):
             # Check that the user is logged in successfully
             self.assertIn(b'Logged in successfully!', response.data)
 
-    # def test_signup(self):
-    #     # Use a mock to simulate user creation
-    #     with patch('flaskr.backend.Backend.sign_up') as mock_create:
-    #         # Set the mock to return True to simulate successful user creation
-    #         mock_create.return_value = True
-    #         # Send a POST request with the signup information
-    #         response = self.client.post('/signup',
-    #                                     data=dict(username='test_user',
-    #                                             email='test_email',
-    #                                             password='test_password',
-    #                                             confirm_password='test_password'))
-    #         # Check that the response has a redirect status code
-    #         self.assertEqual(response.status_code, 200)
-    #         # Check that the response redirects to the login page
-    #         self.assertEqual(response.headers['Location'],
-    #                         '/login')
+    def test_signup(self):
+        # Use a mock to simulate user creation
+        with patch('flaskr.backend.Backend.sign_up') as mock_create:
+            # Set the mock to return True to simulate successful user creation
+            mock_create.return_value = True
+            # Send a POST request with the signup information
+            response = self.client.post('/signup',
+                                        data=dict(username='test_user',
+                                                email='test_email@example.com',
+                                                password='test_password',
+                                                confirm_password='test_password'))
+            # Check that the response has a success status code
+            self.assertEqual(response.status_code, 200)
+            # Check that the user is signed up successfully and logged in
+            self.assertIn(b'Login Page', response.data)
 
-    # def test_logout(self):
-    #     # Use a mock to simulate sign-in
-    #     with patch('flaskr.backend.Backend.sign_in') as mock_verify:
-    #         # Set the mock to return True to simulate a successful sign-in
-    #         mock_verify.return_value = True
-    #         # Use a mock to simulate logout
-    #         with patch('flaskr.backend.Backend.logout_user') as mock_logout:
-    #             # Set the mock to return True to simulate successful logout
-    #             mock_logout.return_value = True
-    #             # Send a GET request to logout
-    #             response = self.client.get('/logout')
-    #             # Check that the response has a redirect status code
-    #             self.assertEqual(response.status_code, 302)
-    #             # Check that the response redirects to the home page
-    #             self.assertEqual(response.headers['Location'],
-    #                              'http://localhost/')
+            # Test for password mismatch
+            response = self.client.post('/signup',
+                                        data=dict(username='test_user',
+                                                email='test_email@example.com',
+                                                password='test_password',
+                                                confirm_password='wrong_password'))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Passwords do not match', response.data)
+
+            # Test for existing username
+            mock_create.return_value = False
+            response = self.client.post('/signup',
+                                        data=dict(username='test_user',
+                                                email='test_email@example.com',
+                                                password='test_password',
+                                                confirm_password='test_password'))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Username already exists', response.data)
+
+    def test_search(self):
+        # Mock the backend.get_all_page_names() method
+        with patch('flaskr.backend.Backend.get_all_page_names') as mock_backend:
+            # Define the mock return value
+            mock_backend.return_value = [
+                'cat1_author1_page1',
+                'cat1_author2_page2',
+                'cat2_author1_page3',
+                'cat2_author2_page4'
+            ]
+
+            # Test search with a query
+            response = self.client.get('/search', query_string={'q': 'page1'})
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'cat1_author1_page1', response.data)
+
+            # Test search with a category
+            response = self.client.get('/search', query_string={'q': 'page', 'category': 'cat1'})
+            print(response.data)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'cat1_author2_page2', response.data)
+            
+
+            # Test search with an author
+            response = self.client.get('/search', query_string={'q': 'page', 'author': 'author1'})
+            self.assertEqual(response.status_code, 200)
+
