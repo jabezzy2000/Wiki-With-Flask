@@ -154,7 +154,7 @@ def make_endpoints(app):
                 return redirect(url_for('login'))
 
         comments = backend.get_comments(pagename)
-        return render_template(f"{pagename}", comments=comments)
+        return render_template(f"{pagename}.html", comments=comments)
        
 
     @app.route("/signup", methods=["GET", "POST"])
