@@ -68,3 +68,24 @@ class TestBackend(unittest.TestCase):
             mock_get_blob.return_value.public_url = expected_url
             url = self.backend.get_image(name_of_image=image_name)
         self.assertEqual(url, expected_url)
+
+
+    def test_add_and_get_comments(self):
+        # First, upload a testpage.html
+        testpage_contents = "<html><body><h1>Test Page</h1></body></html>"
+        testpage_name = "testpage.html"
+        testpage_path = "/tmp/" + testpage_name
+        with open(testpage_path, "w") as f:
+            f.write(testpage_contents)
+        self.backend.upload(testpage_path, testpage_name)
+
+        # Now test the comment section
+        username = "testuser"
+        comment = "This is a test comment."
+        self.backend.add_comment(testpage_name, username, comment)
+        comments = self.backend.get_comments(testpage_name)
+        ls = []
+        for dic in comments:
+            ls.append(dic['comment'])        
+        self.assertIn(comment, ls)
+       
