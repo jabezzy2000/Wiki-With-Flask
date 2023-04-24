@@ -1,6 +1,7 @@
 from flask import render_template, request, abort, redirect, session, url_for
-
+from bs4 import BeautifulSoup
 from flaskr.backend import Backend
+import requests
 import os
 
 
@@ -248,19 +249,20 @@ def make_endpoints(app):
         author = request.args.get('author')
         rating = request.args.get('rating')
         matches = {}
-        all_pages = backend.get_all_page_names()
 
         if not query:
             return redirect(url_for('index'))
 
-        if query:
-            for page in all_pages:
-                if query in page or query.lower() in page or query.upper(
-                ) in page:
-                    matches[page.split("_")[0]] = page
-        else:
-            for page in all_pages:
+        all_pages = backend.get_all_page_names()
+        for page in all_pages:
+        # Retrieve the content of the page
+            page_content = backend.get_wiki_page(page)
+
+        # Check if the query is in the page title or content
+            if query in page or query.lower() in page or query.upper() in page \
+           or query in page_content or query.lower() in page_content or query.upper() in page_content:
                 matches[page.split("_")[0]] = page
+
         if category:
             for key in matches.copy():
                 if category not in key and category != key:
@@ -269,9 +271,8 @@ def make_endpoints(app):
             for key in matches.copy():
                 if author not in key and author != key:
                     del matches[key]
-        return render_template('search_results.html',
-                               query=query,
-                               matches=matches)
+
+        return render_template('search_results.html', query=query, matches=matches,category = category, author = author)
         
     @app.route('/logout')
     def logout():

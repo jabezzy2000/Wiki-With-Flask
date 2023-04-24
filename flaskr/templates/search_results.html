@@ -56,11 +56,12 @@
     {% if query == "" or query == " " %}
       <h1>All Pages Result</h1>
     {% else %}
-      <h1>Search Results for "{{ query }}"</h1>
+    <h1>Search Results for: "{{ query }}", author: {{ author if author else "None" }}, category: {{ category if category else "None" }}</h1>
     {% endif %}
   </div>
 
   <div class="content">
+    <h2>Search Results for "{{ query }}"</h2> <!-- Add this line -->
     {% if matches %}
       <ul>
         {% for name, full_name in matches.items() %}
@@ -73,4 +74,3 @@
   </div>
 </body>
 </html>
-4
