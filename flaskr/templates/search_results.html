@@ -61,7 +61,7 @@
   </div>
 
   <div class="content">
-    <h2>Search Results for "{{ query if query else "None" }}, author: {{ author if author else "None"}},  category: {{ category if category else "None" }}"></h2>
+    <h2>Search Results for "{{ query if query else "None" }}, author: {{ author if author else "None"}},  category: {{ category if category else "None" }}"</h2>
     {% if matches %}
       <ul>
         {% for name, full_name in matches.items() %}
