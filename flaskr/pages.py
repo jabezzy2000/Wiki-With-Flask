@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from flaskr.backend import Backend
 import requests
 import os
+import logging
 
 
 def make_endpoints(app):
@@ -249,28 +250,47 @@ def make_endpoints(app):
         author = request.args.get('author')
         rating = request.args.get('rating')
         matches = {}
+        all_pages = backend.get_all_page_names()
 
         if not query:
-            return redirect(url_for('index'))
-
-        all_pages = backend.get_all_page_names()
+            if not category and not author:
+                return redirect(url_for('index'))
+            else:
+                for page in all_pages:
+                    split_page = page.lower().split("_")
+                    if category.lower() in split_page or author.lower() in split_page:
+                        matches[page.split("_")[0]] = page
+            
+                
         for page in all_pages:
         # Retrieve the content of the page
             page_content = backend.get_wiki_page(page)
+            print(f"page content for {page_content}")
 
         # Check if the query is in the page title or content
             if query in page or query.lower() in page or query.upper() in page \
            or query in page_content or query.lower() in page_content or query.upper() in page_content:
                 matches[page.split("_")[0]] = page
+        
+        logging.debug("matches: %s", matches)
 
         if category:
-            for key in matches.copy():
-                if category not in key and category != key:
+            copy_match = matches.copy()
+            for key in copy_match:
+                logging.debug("key: %s", key)
+                logging.debug("split match: %s", copy_match[key].split("_"))
+                if category not in copy_match[key].split("_"):
                     del matches[key]
         if author:
-            for key in matches.copy():
-                if author not in key and author != key:
+            copy_match = matches.copy()
+            logging.debug("author matches: %s", matches)
+            for key in copy_match:
+                if author.lower() not in copy_match[key].lower().split("_")[-1].split("."):
+                    logging.debug(f"Author: {author}, key: {key} not in {copy_match[key]}: {key in copy_match[key].lower().split('_')}")
+
                     del matches[key]
+
+        logging.debug("filtered matches: %s", matches)
 
         return render_template('search_results.html', query=query, matches=matches,category = category, author = author)
         
