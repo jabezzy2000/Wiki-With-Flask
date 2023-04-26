@@ -11,6 +11,11 @@ def make_endpoints(app):
 
     # Flask uses the "app.route" decorator to call methods when users
     # go to a specific route on the project's website.
+    def slice_string(value, length):
+        return value[:length]
+
+    app.jinja_env.filters['slice_string'] = slice_string
+
     @app.route("/")
     def home(message=""):
         # TODO(Checkpoint Requirement 2 of 3): Change this to use render_template
@@ -250,6 +255,7 @@ def make_endpoints(app):
         author = request.args.get('author')
         rating = request.args.get('rating')
         matches = {}
+        contents = {}
         all_pages = backend.get_all_page_names()
 
         if not query:
@@ -260,6 +266,7 @@ def make_endpoints(app):
                     split_page = page.lower().split("_")
                     if category.lower() in split_page or author.lower() in split_page:
                         matches[page.split("_")[0]] = page
+                        contents[page.split("_")[0]] = backend.get_wiki_page(page).split()[0:4]
             
                 
         for page in all_pages:
@@ -271,8 +278,10 @@ def make_endpoints(app):
             if query in page or query.lower() in page or query.upper() in page \
            or query in page_content or query.lower() in page_content or query.upper() in page_content:
                 matches[page.split("_")[0]] = page
+                contents[page.split("_")[0]] = backend.get_wiki_page(page)
+
         
-        logging.debug("matches: %s", matches)
+        # logging.debug("matches: %s", matches)
 
         if category:
             copy_match = matches.copy()
@@ -281,6 +290,7 @@ def make_endpoints(app):
                 logging.debug("split match: %s", copy_match[key].split("_"))
                 if category not in copy_match[key].split("_"):
                     del matches[key]
+                    del contents[key]
         if author:
             copy_match = matches.copy()
             logging.debug("author matches: %s", matches)
@@ -289,10 +299,12 @@ def make_endpoints(app):
                     logging.debug(f"Author: {author}, key: {key} not in {copy_match[key]}: {key in copy_match[key].lower().split('_')}")
 
                     del matches[key]
+                    del contents[key]
 
-        logging.debug("filtered matches: %s", matches)
+        # logging.debug("filtered matches: %s", matches)
+        logging.debug("contents: %s", contents)
 
-        return render_template('search_results.html', query=query, matches=matches,category = category, author = author)
+        return render_template('search_results.html', query=query, matches=matches,category = category, author = author, contents = contents)
         
     @app.route('/logout')
     def logout():

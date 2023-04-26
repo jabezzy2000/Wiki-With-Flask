@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GPT-4</title>
+  
+        <style>
+    #comments-section {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #f8f8f8;
+    }
+
+    #comments-section h3,
+    #comments-section h4 {
+        margin-bottom: 10px;
+    }
+
+    #comments-section ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #comments-section li {
+        border-bottom: 1px solid #eee;
+        padding: 8px 0;
+    }
+
+    #comments-section li:last-child {
+        border-bottom: none;
+    }
+
+    #comments-section textarea {
+        width: 100%;
+        padding: 5px;
+        resize: none;
+        font-family: inherit;
+        font-size: 14px;
+        border: 1px solid #ccc;
+    }
+
+    #comments-section input[type="submit"] {
+        font-family: inherit;
+        font-size: 14px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    #comments-section input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+</style>
+        </head>
+  <body>
+    <h1>GPT-4</h1>
+    <p>GPT-4 is a hypothetical language model that has been speculated about in the artificial intelligence community.</p>
+    <h2>Overview</h2>
+    <p>GPT-4 is the successor to GPT-3, a state-of-the-art language model developed by OpenAI. GPT-3 has been praised for its ability to perform a wide range of natural language processing tasks, including language translation, summarization, and question answering.</p>
+    <p>While OpenAI has not officially announced plans to develop GPT-4, it is widely believed that the company is working on improving the technology behind the model. Some researchers have speculated that GPT-4 could be capable of even more advanced natural language processing tasks, such as creative writing and story generation.</p>
+    <h2>Features</h2>
+    <ul>
+      <li>State-of-the-art natural language processing</li>
+      <li>Potentially capable of advanced language tasks, such as creative writing and story generation</li>
+      <li>Scalable to handle large datasets</li>
+      <li>Adaptable to different domains and languages</li>
+      <li>Continual learning capabilities to improve over time</li>
+    </ul>
+    <h2>Impact</h2>
+    <p>GPT-4, if and when it is developed, could have a significant impact on various industries that rely on natural language processing technology. For example, it could be used to improve machine translation and make it easier for people to communicate with others who speak different languages. It could also be used to develop more advanced chatbots and virtual assistants that can better understand and respond to human language.</p>
+    <p>However, there are also concerns about the potential misuse of GPT-4, such as the creation of fake news or the manipulation of public opinion through automated content generation. As with any technology, it will be important to develop safeguards and ethical guidelines to ensure that GPT-4 is used responsibly.</p>
+  </body>
+</html>
+
+                <div id="comments-section">
+                    <h3>Comments</h3>
+                    {% if comments %}
+                        <ul>
+                            {% for comment in comments %}
+                                <li><b>{{ comment.username }}:</b> {{ comment.comment }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No comments yet.</p>
+                    {% endif %}
+
+                    {% if 'username' in session %}
+                        <h4>Add a comment</h4>
+                        <form method="POST">
+                            <textarea name="comment" rows="4" cols="50" required></textarea><br>
+                            <input type="submit" value="Submit">
+                        </form>
+                    {% else %}
+                        <p>You must <a href="{{ url_for('login') }}">log in</a> to post a comment.</p>
+                    {% endif %}
+                </div>
+            

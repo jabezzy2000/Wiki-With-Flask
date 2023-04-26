@@ -10,6 +10,7 @@
       line-height: 1.5;
       margin: 0;
       padding: 0;
+      background-color: #f4f4f4;
     }
     a {
       color: #0077c0;
@@ -18,24 +19,26 @@
     a:hover {
       text-decoration: underline;
     }
-    
+
     /* Header styles */
     .header {
       background-color: #0077c0;
       color: #fff;
       padding: 20px;
+      text-align: center;
     }
     .header h1 {
       font-size: 32px;
       margin: 0;
     }
-    
+
     /* Content styles */
     .content {
       margin: 20px;
       padding: 20px;
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
     }
     .content ul {
       list-style: none;
@@ -43,11 +46,29 @@
       padding: 0;
     }
     .content li {
-      margin-bottom: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .content li:last-child {
+      border-bottom: none;
     }
     .content p {
       color: #777;
       margin: 20px 0;
+    }
+    .content h2 {
+      font-size: 24px;
+      margin: 0 0 20px;
+      text-align: center;
+    }
+
+    /* Snippet styles */
+    .snippet {
+      font-size: 14px;
+      color: #777;
+      margin-top: 5px;
+      word-wrap: break-word;
     }
   </style>
 </head>
@@ -65,7 +86,10 @@
     {% if matches %}
       <ul>
         {% for name, full_name in matches.items() %}
-          <li><a href="{{ url_for('pages', pagename=full_name) }}">{{ name }}</a></li>
+          <li>
+            <a href="{{ url_for('pages', pagename=full_name) }}">{{ name }}</a>
+            <div class="snippet">{{ (contents[name]|striptags if name in contents else 'No content available.')|slice_string(100)|safe }}{% if name in contents and contents[name]|length > 100 %}...{% endif %}</div>
+          </li>
         {% endfor %}
       </ul>
     {% else %}
@@ -74,4 +98,3 @@
   </div>
   </body>
   </html>
-  
